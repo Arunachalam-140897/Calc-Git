@@ -6,7 +6,7 @@ WORKDIR /app
 COPY package*.json ./
 
 # Use npm ci in CI contexts; fallback to npm install if package-lock not present
-RUN npm ci --only=production || npm install --only=production
+RUN npm install --only=production
 
 # Copy app source
 COPY . .
