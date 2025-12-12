@@ -5,6 +5,8 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+app.get('/health', (req, res) => res.sendStatus(200));
+
 app.post('/add', (req, res) => {
   const { num1, num2 } = req.body;
   if (typeof num1 !== 'number' || typeof num2 !== 'number') {

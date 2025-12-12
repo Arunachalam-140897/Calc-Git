@@ -1,16 +1,6 @@
-services:
-  frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
-    ports:
-      - "80:80"
-    depends_on:
-      - add
-      - subtract
-    networks:
-      - app-network
+version: '3.8'
 
+services:
   add:
     build:
       context: ./add
@@ -19,6 +9,12 @@ services:
       - "8000:8000"
     networks:
       - app-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health" ]
+      interval: 10s
+      timeout: 3s
+      retries: 5
 
   subtract:
     build:
@@ -28,7 +24,71 @@ services:
       - "9000:9000"
     networks:
       - app-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/health" ]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+    depends_on:
+      add:
+        condition: service_healthy
+      subtract:
+        condition: service_healthy
+    networks:
+      - app-network
+    restart: unless-stopped
 
 networks:
   app-network:
     driver: bridge
+
+
+
+
+
+
+
+
+
+# services:
+#   frontend:
+#     build:
+#       context: ./frontend
+#       dockerfile: Dockerfile
+#     ports:
+#       - "80:80"
+#     depends_on:
+#       - add
+#       - subtract
+#     networks:
+#       - app-network
+
+#   add:
+#     build:
+#       context: ./add
+#       dockerfile: Dockerfile
+#     ports:
+#       - "8000:8000"
+#     networks:
+#       - app-network
+
+#   subtract:
+#     build:
+#       context: ./subtract
+#       dockerfile: Dockerfile
+#     ports:
+#       - "9000:9000"
+#     networks:
+#       - app-network
+
+# networks:
+#   app-network:
+#     driver: bridge
